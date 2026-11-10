@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Kira-Kira Bisnes Mikro & Sederhana</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body { background-color: #0d0f12; color: #f3f4f6; font-family: system-ui, -apple-system, sans-serif; padding-bottom: 80px; }
+        .card-bg { background-color: #161920; border: 1px solid #222632; }
+        /* Sticky mobile navigation */
+        .mobile-nav { position: fixed; bottom: 0; left: 0; right: 0; background-color: #111318; border-top: 1px solid #222632; z-index: 50; }
+        .nav-btn { display: flex; flex-direction: column; items-center; justify-content: center; width: 25%; padding: 0.75rem 0; color: #6b7280; font-size: 0.65rem; font-weight: 500; transition: color 0.2s; }
+        .nav-btn.active { color: #10b981; }
+        .nav-btn i { margin-bottom: 0.25rem; width: 1.25rem; height: 1.25rem; }
+    </style>
+</head>
+<body class="min-h-screen">
+
+    <!-- Header -->
+    <header class="p-4 border-b border-[#222632] bg-[#111318] sticky top-0 z-50">
+        <h1 class="text-lg font-bold text-white tracking-wide">Buku Bisnes <span class="text-emerald-400">Mudah</span></h1>
+        <p class="text-xs text-gray-400">Pantau Stok, Iklan & Untung Poket</p>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="p-4">
+
+        <!-- TAB: JUALAN HARIAN (DASHBOARD) -->
+        <div id="tab-jualan" class="space-y-4">
+            <div class="card-bg p-5 rounded-2xl text-center shadow-lg border-emerald-500/30 border">
+                <p class="text-sm text-gray-400">Jualan Hari Ini (Kasar)</p>
+                <p class="text-4xl font-bold text-white mt-1" id="display-sales">RM 0.00</p>
+            </div>
+
+            <div class="card-bg p-5 rounded-xl space-y-4">
+                <h3 class="font-medium text-white">Masukkan Jualan Baru</h3>
+                <div class="space-y-3">
+                    <div>
+                        <label class="text-xs text-gray-400 block mb-1">Pilih Barang (Stok Automatik Tolak)</label>
+                        <select id="sale-item" class="w-full bg-[#111318] border border-[#222632] text-sm text-white rounded-lg p-3">
+                            <option value="Tudung Bawal">Tudung Bawal - Jual: RM25 (Kos: RM10)</option>
+                            <option value="Krim Muka">Krim Muka - Jual: RM40 (Kos: RM15)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-xs text-gray-400 block mb-1">Kuantiti Terjual</label>
+                        <input type="number" id="sale-qty" value="1" min="1" class="w-full bg-[#111318] border border-[#222632] text-sm text-white rounded-lg p-3">
+                    </div>
+                    <button onclick="addSale()" class="w-full bg-emerald-600 active:bg-emerald-700 text-white font-medium rounded-lg p-3 transition shadow-lg shadow-emerald-900/50">
+                        + Catat Jualan
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: STOK & MODAL (COGS) -->
+        <div id="tab-stok" class="space-y-4 hidden">
+            <div class="card-bg p-5 rounded-xl">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="font-medium text-white">Gudang & Modal Barang</h3>
+                    <button class="text-xs bg-[#222632] text-white px-3 py-1.5 rounded-lg">+ Barang Baru</button>
+                </div>
+                
+                <div class="space-y-3">
+                    <!-- Item 1 -->
+                    <div class="p-3 bg-[#111318] border border-[#222632] rounded-lg">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="font-medium text-white text-sm">Tudung Bawal</p>
+                                <p class="text-xs text-gray-400 mt-1">Kos Modal: <span class="text-red-400">RM10.00</span> | Harga Jual: <span class="text-emerald-400">RM25.00</span></p>
+                                <p class="text-xs text-blue-400 mt-1">Untung Sehelai: RM15.00</p>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-xs bg-gray-800 text-gray-300 px-2 py-1 rounded">Baki Stok: 45</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Item 2 -->
+                    <div class="p-3 bg-[#111318] border border-[#222632] rounded-lg">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="font-medium text-white text-sm">Krim Muka</p>
+                                <p class="text-xs text-gray-400 mt-1">Kos Modal: <span class="text-red-400">RM15.00</span> | Harga Jual: <span class="text-emerald-400">RM40.00</span></p>
+                                <p class="text-xs text-blue-400 mt-1">Untung Sebotol: RM25.00</p>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-xs bg-amber-500/10 text-amber-400 px-2 py-1 rounded">Baki Stok: 5 (Low)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-4 p-4 border border-dashed border-[#222632] rounded-lg text-xs text-gray-500 text-center">
+                    Bila abang catat jualan, stok akan ditolak dan Kos Modal (COGS) dikira automatik.
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: IKLAN & OVERHEAD -->
+        <div id="tab-iklan" class="space-y-4 hidden">
+            <div class="grid grid-cols-2 gap-3">
+                <div class="card-bg p-4 rounded-xl text-center border border-red-500/20">
+                    <p class="text-xs text-gray-400">Total Kos Iklan</p>
+                    <p class="text-xl font-bold text-red-400 mt-1">RM 250.00</p>
+                </div>
+                <div class="card-bg p-4 rounded-xl text-center border border-orange-500/20">
+                    <p class="text-xs text-gray-400">Kos Lain (Sewa/Gaji)</p>
+                    <p class="text-xl font-bold text-orange-400 mt-1">RM 120.00</p>
+                </div>
+            </div>
+
+            <div class="card-bg p-5 rounded-xl space-y-4">
+                <h3 class="font-medium text-white">Masukkan Kos Pemasaran (Marketing)</h3>
+                <div class="space-y-3">
+                    <div>
+                        <label class="text-xs text-gray-400 block mb-1">Jenis Belanja Iklan</label>
+                        <select id="expense-type" class="w-full bg-[#111318] border border-[#222632] text-sm text-white rounded-lg p-3">
+                            <option value="FB Ads">Facebook Ads</option>
+                            <option value="TikTok Ads">TikTok Ads</option>
+                            <option value="Banner">Cetak Banner / Banting</option>
+                            <option value="Influencer">Bayar Influencer / Review</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-xs text-gray-400 block mb-1">Jumlah Duit Keluar (RM)</label>
+                        <input type="number" id="expense-amount" placeholder="Cth: 50" class="w-full bg-[#111318] border border-[#222632] text-sm text-white rounded-lg p-3">
+                    </div>
+                    <button onclick="addExpense()" class="w-full bg-red-600 active:bg-red-700 text-white font-medium rounded-lg p-3 transition shadow-lg shadow-red-900/50">
+                        - Rekod Kos Iklan
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: UNTUNG RUGI (P&L) -->
+        <div id="tab-laporan" class="space-y-4 hidden">
+            <h2 class="text-lg font-semibold text-white px-1">Laporan Poket Bulan Ini</h2>
+            
+            <div class="card-bg rounded-xl overflow-hidden shadow-lg border-[#222632]">
+                <div class="p-5 space-y-4">
+                    <!-- Revenue -->
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm text-gray-300">Duit Masuk (Jualan Kasar)</span>
+                        <span class="text-sm font-bold text-white">RM 1,200.00</span>
+                    </div>
+                    
+                    <hr class="border-[#222632]">
+                    
+                    <!-- COGS -->
+                    <div class="flex justify-between items-center">
+                        <div class="flex flex-col">
+                            <span class="text-sm text-gray-300">Modal Barang (COGS)</span>
+                            <span class="text-[10px] text-gray-500">Kos barang yang telah terjual sahaja</span>
+                        </div>
+                        <span class="text-sm font-medium text-red-400">- RM 450.00</span>
+                    </div>
+                    
+                    <!-- Gross Profit Visual -->
+                    <div class="bg-[#111318] p-3 rounded flex justify-between items-center border border-[#222632]">
+                        <span class="text-xs text-blue-400">Untung Kasar (Baki lepas tolak barang)</span>
+                        <span class="text-xs font-bold text-blue-400">RM 750.00</span>
+                    </div>
+
+                    <!-- Marketing -->
+                    <div class="flex justify-between items-center pt-2">
+                        <span class="text-sm text-gray-300">Kos Iklan (Marketing)</span>
+                        <span class="text-sm font-medium text-red-400">- RM 250.00</span>
+                    </div>
+
+                    <!-- Overheads -->
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm text-gray-300">Overhed (Tapak/Gaji/Tol)</span>
+                        <span class="text-sm font-medium text-orange-400">- RM 120.00</span>
+                    </div>
+
+                    <hr class="border-[#222632] border-2">
+
+                    <!-- Net Profit -->
+                    <div class="flex justify-between items-center bg-emerald-900/20 p-4 rounded-lg border border-emerald-500/30">
+                        <div class="flex flex-col">
+                            <span class="font-bold text-white">Untung Bersih Poket</span>
+                            <span class="text-[10px] text-emerald-400">Duit ini abang selamat nak simpan/guna</span>
+                        </div>
+                        <span class="text-xl font-black text-emerald-400">RM 380.00</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="p-4 bg-blue-900/20 border border-blue-500/30 rounded-xl flex gap-3 items-start mt-2">
+                <i data-lucide="info" class="text-blue-400 w-5 h-5 shrink-0 mt-0.5"></i>
+                <p class="text-xs text-blue-200 leading-relaxed">
+                    Sistem ini mengira <strong>Untung Bersih sebenar</strong>. Walaupun abang nampak RM1,200 masuk ke akaun bank, duit selamat abang hanyalah RM380 selepas menolak modal restock barang dan bayar iklan.
+                </p>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Mobile Bottom Navigation -->
+    <nav class="mobile-nav flex justify-around">
+        <button onclick="switchTab('jualan')" id="nav-jualan" class="nav-btn active">
+            <i data-lucide="receipt"></i>
+            <span>Jualan</span>
+        </button>
+        <button onclick="switchTab('stok')" id="nav-stok" class="nav-btn">
+            <i data-lucide="package"></i>
+            <span>Stok</span>
+        </button>
+        <button onclick="switchTab('iklan')" id="nav-iklan" class="nav-btn">
+            <i data-lucide="trending-down"></i>
+            <span>Iklan</span>
+        </button>
+        <button onclick="switchTab('laporan')" id="nav-laporan" class="nav-btn">
+            <i data-lucide="pie-chart"></i>
+            <span>Untung</span>
+        </button>
+    </nav>
+
+    <script>
+        lucide.createIcons();
+
+        function switchTab(tabId) {
+            ['jualan', 'stok', 'iklan', 'laporan'].forEach(id => {
+                document.getElementById('tab-' + id).classList.add('hidden');
+                document.getElementById('nav-' + id).classList.remove('active');
+            });
+            document.getElementById('tab-' + tabId).classList.remove('hidden');
+            document.getElementById('nav-' + tabId).classList.add('active');
+            window.scrollTo(0, 0);
+        }
+
+        // Dummy visual feedback for forms
+        function addSale() {
+            alert("Jualan direkod! Sistem menolak stok dan mengira Kos Barang (COGS) di latar belakang secara automatik.");
+        }
+        function addExpense() {
+            alert("Kos Iklan dimasukkan! Buku Untung Bersih telah dikemas kini.");
+        }
+    </script>
+</body>
+</html>
+
+```
